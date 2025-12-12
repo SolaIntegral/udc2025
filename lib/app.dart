@@ -12,7 +12,7 @@ import 'features/emergency/presentation/pages/sos_page.dart';
 /// アプリケーションのルーティング設定
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/onboarding',
+    initialLocation: '/emergency',
     routes: [
       GoRoute(
         path: '/onboarding',
