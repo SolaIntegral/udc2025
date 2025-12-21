@@ -8,6 +8,10 @@ import 'features/group/presentation/pages/group_create_page.dart';
 import 'features/group/presentation/pages/group_member_add_page.dart';
 import 'features/emergency/presentation/pages/emergency_status_page.dart';
 import 'features/emergency/presentation/pages/sos_page.dart';
+import 'features/communication/presentation/pages/radar_page.dart';
+import 'features/communication/presentation/pages/chat_page.dart';
+import 'features/communication/presentation/pages/safety_page.dart';
+import 'features/communication/presentation/pages/profile_page.dart';
 
 /// アプリケーションのルーティング設定
 final routerProvider = Provider<GoRouter>((ref) {
@@ -44,6 +48,23 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/sos',
         builder: (context, state) => const SosPage(),
+      ),
+      // コミュニケーション機能
+      GoRoute(
+        path: '/communication/radar',
+        builder: (context, state) => const RadarPage(),
+      ),
+      GoRoute(
+        path: '/communication/chat',
+        builder: (context, state) => const ChatPage(),
+      ),
+      GoRoute(
+        path: '/communication/safety',
+        builder: (context, state) => const SafetyPage(),
+      ),
+      GoRoute(
+        path: '/communication/profile',
+        builder: (context, state) => const ProfilePage(),
       ),
     ],
   );

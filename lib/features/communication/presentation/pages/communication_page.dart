@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// コミュニケーション画面（青のヘッダー）
-/// コミュニティ機能、Bluetooth、シェア機能など
+/// コミュニティ機能のメイン画面
 class CommunicationPage extends StatefulWidget {
   const CommunicationPage({super.key});
 
@@ -30,144 +31,87 @@ class _CommunicationPageState extends State<CommunicationPage> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Bluetooth機能
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.bluetooth, color: Colors.blue),
-                        SizedBox(width: 8),
-                        Text(
-                          'Bluetooth機能',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'オフラインでも周辺の人と情報を共有できます',
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        // TODO: Bluetooth接続開始
-                      },
-                      icon: const Icon(Icons.bluetooth_searching),
-                      label: const Text('周辺を検索'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
+            // Bluetoothステータス表示
+            Container(
+              padding: const EdgeInsets.all(12.0),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.shade200),
               ),
+              child: Row(
+                children: [
+                  const Icon(Icons.bluetooth, color: Colors.blue),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      '現在オフラインモード：半径50mの人とつながれます',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // 1. 周辺ユーザー探索・レーダー画面
+            _buildFeatureCard(
+              context: context,
+              icon: Icons.radar,
+              iconColor: Colors.orange,
+              title: '周辺ユーザー探索',
+              subtitle: '近くに誰がいるか確認',
+              description: 'Bluetoothで周辺のアプリユーザーを検索し、助け合える人を見つけます',
+              badge: '5人発見',
+              onTap: () {
+                context.push('/communication/radar');
+              },
             ),
             const SizedBox(height: 16),
 
-            // コミュニティ機能
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'コミュニティ',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildCommunityOption(
-                      icon: Icons.people,
-                      title: '同じ国・性別の人とのグループ',
-                      subtitle: '事前にグループを作って協力',
-                      onTap: () {
-                        // TODO: グループ作成ページへ遷移
-                      },
-                    ),
-                    const Divider(),
-                    _buildCommunityOption(
-                      icon: Icons.location_on,
-                      title: '同じシェルターの人と協力',
-                      subtitle: 'シェルターでフィルタリング',
-                      onTap: () {
-                        // TODO: シェルターフィルター機能
-                      },
-                    ),
-                    const Divider(),
-                    _buildCommunityOption(
-                      icon: Icons.favorite,
-                      title: '身近な人のみ共有',
-                      subtitle: '信頼できるグループのみ',
-                      onTap: () {
-                        // TODO: 信頼グループ設定
-                      },
-                    ),
-                  ],
-                ),
-              ),
+            // 2. オフライン・チャット画面
+            _buildFeatureCard(
+              context: context,
+              icon: Icons.chat_bubble_outline,
+              iconColor: Colors.green,
+              title: 'オフライン・チャット',
+              subtitle: 'つながる・話す',
+              description: '周辺の人とメッセージを交換。自動翻訳・やさしい日本語対応',
+              badge: '3件の未読',
+              onTap: () {
+                context.push('/communication/chat');
+              },
             ),
             const SizedBox(height: 16),
 
-            // SNSの動線
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'SNS連携',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      '情報をSNSでシェアして、より多くの人に伝えましょう',
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              // TODO: Twitter連携
-                            },
-                            icon: const Icon(Icons.chat_bubble_outline),
-                            label: const Text('Twitter'),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              // TODO: Facebook連携
-                            },
-                            icon: const Icon(Icons.facebook),
-                            label: const Text('Facebook'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+            // 3. グループ安否確認画面
+            _buildFeatureCard(
+              context: context,
+              icon: Icons.family_restroom,
+              iconColor: Colors.purple,
+              title: 'グループ安否確認',
+              subtitle: '身内の安全',
+              description: '事前に登録した信頼できるメンバーの安否を確認',
+              badge: '全員無事',
+              onTap: () {
+                context.push('/communication/safety');
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // 4. プロフィール・支援設定画面
+            _buildFeatureCard(
+              context: context,
+              icon: Icons.person_outline,
+              iconColor: Colors.teal,
+              title: 'プロフィール・支援設定',
+              subtitle: '信頼とマッチングの準備',
+              description: '自分の属性やスキルを登録し、共助をスムーズに',
+              onTap: () {
+                context.push('/communication/profile');
+              },
             ),
           ],
         ),
@@ -175,41 +119,96 @@ class _CommunicationPageState extends State<CommunicationPage> {
     );
   }
 
-  Widget _buildCommunityOption({
+  Widget _buildFeatureCard({
+    required BuildContext context,
     required IconData icon,
+    required Color iconColor,
     required String title,
     required String subtitle,
+    required String description,
+    String? badge,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.blue),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                ],
+    return Card(
+      elevation: 2,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              // アイコン
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: iconColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: iconColor, size: 32),
               ),
-            ),
-            const Icon(Icons.chevron_right, color: Colors.grey),
-          ],
+              const SizedBox(width: 16),
+              // テキスト情報
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        if (badge != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade100,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              badge,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.blue.shade700,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right, color: Colors.grey),
+            ],
+          ),
         ),
       ),
     );
