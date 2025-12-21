@@ -2,25 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'features/onboarding/presentation/pages/onboarding_page.dart';
-import 'features/map/presentation/pages/map_page.dart';
+import 'features/home/presentation/pages/home_page.dart';
 import 'features/group/presentation/pages/group_list_page.dart';
 import 'features/group/presentation/pages/group_create_page.dart';
 import 'features/group/presentation/pages/group_member_add_page.dart';
 import 'features/emergency/presentation/pages/emergency_status_page.dart';
 import 'features/emergency/presentation/pages/sos_page.dart';
+import 'features/communication/presentation/pages/radar_page.dart';
+import 'features/communication/presentation/pages/chat_page.dart';
+import 'features/communication/presentation/pages/safety_page.dart';
+import 'features/communication/presentation/pages/profile_page.dart';
 
 /// アプリケーションのルーティング設定
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/emergency',
+    initialLocation: '/home',
     routes: [
       GoRoute(
         path: '/onboarding',
         builder: (context, state) => const OnboardingPage(),
       ),
       GoRoute(
-        path: '/map',
-        builder: (context, state) => const MapPage(),
+        path: '/home',
+        builder: (context, state) => const HomePage(),
       ),
       GoRoute(
         path: '/groups',
@@ -44,6 +48,23 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/sos',
         builder: (context, state) => const SosPage(),
+      ),
+      // コミュニケーション機能
+      GoRoute(
+        path: '/communication/radar',
+        builder: (context, state) => const RadarPage(),
+      ),
+      GoRoute(
+        path: '/communication/chat',
+        builder: (context, state) => const ChatPage(),
+      ),
+      GoRoute(
+        path: '/communication/safety',
+        builder: (context, state) => const SafetyPage(),
+      ),
+      GoRoute(
+        path: '/communication/profile',
+        builder: (context, state) => const ProfilePage(),
       ),
     ],
   );

@@ -6,20 +6,34 @@ part of 'user_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
-    _$UserModelImpl(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      language: json['language'] as String? ?? 'ja',
-      isVulnerable: json['isVulnerable'] as bool? ?? false,
-      profileImageUrl: json['profileImageUrl'] as String?,
-      createdAt: json['createdAt'] == null
-          ? null
-          : DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
-          ? null
-          : DateTime.parse(json['updatedAt'] as String),
-    );
+_$UserModelImpl _$$UserModelImplFromJson(
+  Map<String, dynamic> json,
+) => _$UserModelImpl(
+  id: json['id'] as String,
+  name: json['name'] as String,
+  language: json['language'] as String? ?? 'ja',
+  isVulnerable: json['isVulnerable'] as bool? ?? false,
+  profileImageUrl: json['profileImageUrl'] as String?,
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
+  nationality: json['nationality'] as String?,
+  religiousConsiderations: json['religiousConsiderations'] as String?,
+  needs: (json['needs'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  skills: (json['skills'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  status:
+      $enumDecodeNullable(_$UserStatusEnumMap, json['status']) ??
+      UserStatus.unknown,
+  batteryLevel: (json['batteryLevel'] as num?)?.toInt() ?? 100,
+  latitude: (json['latitude'] as num?)?.toDouble(),
+  longitude: (json['longitude'] as num?)?.toDouble(),
+  lastSeenAt: json['lastSeenAt'] == null
+      ? null
+      : DateTime.parse(json['lastSeenAt'] as String),
+);
 
 Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
     <String, dynamic>{
@@ -30,4 +44,19 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'profileImageUrl': instance.profileImageUrl,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
+      'nationality': instance.nationality,
+      'religiousConsiderations': instance.religiousConsiderations,
+      'needs': instance.needs,
+      'skills': instance.skills,
+      'status': _$UserStatusEnumMap[instance.status]!,
+      'batteryLevel': instance.batteryLevel,
+      'latitude': instance.latitude,
+      'longitude': instance.longitude,
+      'lastSeenAt': instance.lastSeenAt?.toIso8601String(),
     };
+
+const _$UserStatusEnumMap = {
+  UserStatus.ok: 'ok',
+  UserStatus.sos: 'sos',
+  UserStatus.unknown: 'unknown',
+};
