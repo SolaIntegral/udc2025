@@ -13,6 +13,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  # 電話・外部リンク起動
+  url_launcher: ^6.3.0
+
   # UI
   cupertino_icons: ^1.0.8
 
