@@ -12,11 +12,7 @@ _$EmergencyStatusModelImpl _$$EmergencyStatusModelImplFromJson(
   userId: json['userId'] as String,
   status: $enumDecode(_$EmergencyStatusTypeEnumMap, json['status']),
   message: json['message'] as String?,
-  latitude: (json['latitude'] as num?)?.toDouble(),
-  longitude: (json['longitude'] as num?)?.toDouble(),
-  timestamp: json['timestamp'] == null
-      ? null
-      : DateTime.parse(json['timestamp'] as String),
+  timestamp: DateTime.parse(json['timestamp'] as String),
 );
 
 Map<String, dynamic> _$$EmergencyStatusModelImplToJson(
@@ -25,9 +21,7 @@ Map<String, dynamic> _$$EmergencyStatusModelImplToJson(
   'userId': instance.userId,
   'status': _$EmergencyStatusTypeEnumMap[instance.status]!,
   'message': instance.message,
-  'latitude': instance.latitude,
-  'longitude': instance.longitude,
-  'timestamp': instance.timestamp?.toIso8601String(),
+  'timestamp': instance.timestamp.toIso8601String(),
 };
 
 const _$EmergencyStatusTypeEnumMap = {

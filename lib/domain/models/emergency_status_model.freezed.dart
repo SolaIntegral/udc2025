@@ -24,9 +24,7 @@ mixin _$EmergencyStatusModel {
   String get userId => throw _privateConstructorUsedError;
   EmergencyStatusType get status => throw _privateConstructorUsedError;
   String? get message => throw _privateConstructorUsedError;
-  double? get latitude => throw _privateConstructorUsedError; // 位置情報（緯度）
-  double? get longitude => throw _privateConstructorUsedError; // 位置情報（経度）
-  DateTime? get timestamp => throw _privateConstructorUsedError;
+  DateTime get timestamp => throw _privateConstructorUsedError;
 
   /// Serializes this EmergencyStatusModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -49,9 +47,7 @@ abstract class $EmergencyStatusModelCopyWith<$Res> {
     String userId,
     EmergencyStatusType status,
     String? message,
-    double? latitude,
-    double? longitude,
-    DateTime? timestamp,
+    DateTime timestamp,
   });
 }
 
@@ -76,9 +72,7 @@ class _$EmergencyStatusModelCopyWithImpl<
     Object? userId = null,
     Object? status = null,
     Object? message = freezed,
-    Object? latitude = freezed,
-    Object? longitude = freezed,
-    Object? timestamp = freezed,
+    Object? timestamp = null,
   }) {
     return _then(
       _value.copyWith(
@@ -94,18 +88,10 @@ class _$EmergencyStatusModelCopyWithImpl<
                 ? _value.message
                 : message // ignore: cast_nullable_to_non_nullable
                       as String?,
-            latitude: freezed == latitude
-                ? _value.latitude
-                : latitude // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            longitude: freezed == longitude
-                ? _value.longitude
-                : longitude // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            timestamp: freezed == timestamp
+            timestamp: null == timestamp
                 ? _value.timestamp
                 : timestamp // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
+                      as DateTime,
           )
           as $Val,
     );
@@ -125,9 +111,7 @@ abstract class _$$EmergencyStatusModelImplCopyWith<$Res>
     String userId,
     EmergencyStatusType status,
     String? message,
-    double? latitude,
-    double? longitude,
-    DateTime? timestamp,
+    DateTime timestamp,
   });
 }
 
@@ -148,9 +132,7 @@ class __$$EmergencyStatusModelImplCopyWithImpl<$Res>
     Object? userId = null,
     Object? status = null,
     Object? message = freezed,
-    Object? latitude = freezed,
-    Object? longitude = freezed,
-    Object? timestamp = freezed,
+    Object? timestamp = null,
   }) {
     return _then(
       _$EmergencyStatusModelImpl(
@@ -166,18 +148,10 @@ class __$$EmergencyStatusModelImplCopyWithImpl<$Res>
             ? _value.message
             : message // ignore: cast_nullable_to_non_nullable
                   as String?,
-        latitude: freezed == latitude
-            ? _value.latitude
-            : latitude // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        longitude: freezed == longitude
-            ? _value.longitude
-            : longitude // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        timestamp: freezed == timestamp
+        timestamp: null == timestamp
             ? _value.timestamp
             : timestamp // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
+                  as DateTime,
       ),
     );
   }
@@ -190,9 +164,7 @@ class _$EmergencyStatusModelImpl implements _EmergencyStatusModel {
     required this.userId,
     required this.status,
     this.message,
-    this.latitude,
-    this.longitude,
-    this.timestamp,
+    required this.timestamp,
   });
 
   factory _$EmergencyStatusModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -205,17 +177,11 @@ class _$EmergencyStatusModelImpl implements _EmergencyStatusModel {
   @override
   final String? message;
   @override
-  final double? latitude;
-  // 位置情報（緯度）
-  @override
-  final double? longitude;
-  // 位置情報（経度）
-  @override
-  final DateTime? timestamp;
+  final DateTime timestamp;
 
   @override
   String toString() {
-    return 'EmergencyStatusModel(userId: $userId, status: $status, message: $message, latitude: $latitude, longitude: $longitude, timestamp: $timestamp)';
+    return 'EmergencyStatusModel(userId: $userId, status: $status, message: $message, timestamp: $timestamp)';
   }
 
   @override
@@ -226,25 +192,14 @@ class _$EmergencyStatusModelImpl implements _EmergencyStatusModel {
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.message, message) || other.message == message) &&
-            (identical(other.latitude, latitude) ||
-                other.latitude == latitude) &&
-            (identical(other.longitude, longitude) ||
-                other.longitude == longitude) &&
             (identical(other.timestamp, timestamp) ||
                 other.timestamp == timestamp));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    userId,
-    status,
-    message,
-    latitude,
-    longitude,
-    timestamp,
-  );
+  int get hashCode =>
+      Object.hash(runtimeType, userId, status, message, timestamp);
 
   /// Create a copy of EmergencyStatusModel
   /// with the given fields replaced by the non-null parameter values.
@@ -269,9 +224,7 @@ abstract class _EmergencyStatusModel implements EmergencyStatusModel {
     required final String userId,
     required final EmergencyStatusType status,
     final String? message,
-    final double? latitude,
-    final double? longitude,
-    final DateTime? timestamp,
+    required final DateTime timestamp,
   }) = _$EmergencyStatusModelImpl;
 
   factory _EmergencyStatusModel.fromJson(Map<String, dynamic> json) =
@@ -284,11 +237,7 @@ abstract class _EmergencyStatusModel implements EmergencyStatusModel {
   @override
   String? get message;
   @override
-  double? get latitude; // 位置情報（緯度）
-  @override
-  double? get longitude; // 位置情報（経度）
-  @override
-  DateTime? get timestamp;
+  DateTime get timestamp;
 
   /// Create a copy of EmergencyStatusModel
   /// with the given fields replaced by the non-null parameter values.

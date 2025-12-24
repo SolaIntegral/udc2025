@@ -7,24 +7,24 @@ class EvacuationItem {
   final String name;
 
   /// 持ち出し確認済みかどうか
-  final bool isChecked;
+  final bool checked;
 
   const EvacuationItem({
     required this.id,
     required this.name,
-    required this.isChecked,
+    this.checked = false,
   });
 
   /// チェック状態を更新した新しいインスタンスを返す
   EvacuationItem copyWith({
     String? id,
     String? name,
-    bool? isChecked,
+    bool? checked,
   }) {
     return EvacuationItem(
       id: id ?? this.id,
       name: name ?? this.name,
-      isChecked: isChecked ?? this.isChecked,
+      checked: checked ?? this.checked,
     );
   }
 
@@ -33,7 +33,7 @@ class EvacuationItem {
     return EvacuationItem(
       id: map['id'] as String,
       name: map['name'] as String,
-      isChecked: map['isChecked'] as bool,
+      checked: (map['checked'] as bool?) ?? (map['isChecked'] as bool?) ?? false,
     );
   }
 
@@ -42,7 +42,7 @@ class EvacuationItem {
     return {
       'id': id,
       'name': name,
-      'isChecked': isChecked,
+      'checked': checked,
     };
   }
 }
