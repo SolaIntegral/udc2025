@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../domain/models/chat_room_model.dart';
 import '../../../../domain/models/chat_message_model.dart';
+import '../../../../core/widgets/user_avatar_icon.dart';
+import '../widgets/message_bubble.dart';
+import '../widgets/quick_reply_button.dart';
+
+// Figmaの画像アセットURLを定数として定義
+const String imgSend = "http://localhost:3845/assets/5d6b60bb22e7e3030fcff2d21cf804edc2b94b68.svg";
 
 /// チャットルーム画面（1対1/グループ）
+/// Figmaデザインに基づいた会話画面
 class ChatRoomPage extends StatefulWidget {
   final ChatRoomModel room;
 
@@ -54,6 +62,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           roomId: widget.room.id,
           isRead: true,
         ),
+        ChatMessageModel(
+          id: 'msg3',
+          senderId: 'user1',
+          senderName: '田中 太郎',
+          content: '良かったです。何か必要なものがあれば教えてください。',
+          type: ChatMessageType.text,
+          timestamp: DateTime.now().subtract(const Duration(minutes: 8)),
+          roomId: widget.room.id,
+          isRead: true,
+        ),
       ]);
     });
   }
@@ -61,168 +79,194 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.room.name),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.translate),
-            onPressed: () {
-              // TODO: 翻訳機能
-            },
-            tooltip: '翻訳',
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // 定型文ボタン
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            color: Colors.grey.shade100,
-            height: 50,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                _buildTemplateButton('水を持っていますか？'),
-                _buildTemplateButton('怪我をしていますか？'),
-                _buildTemplateButton('大丈夫ですか？'),
-                _buildTemplateButton('助けが必要です'),
-              ],
-            ),
-          ),
-          // メッセージリスト
-          Expanded(
-            child: _messages.isEmpty
-                ? const Center(
-                    child: Text('メッセージがありません'),
-                  )
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.all(8),
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) {
-                      return _buildMessageBubble(_messages[index]);
-                    },
-                  ),
-          ),
-          // メッセージ入力欄
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade300,
-                  blurRadius: 4,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: const InputDecoration(
-                      hintText: 'メッセージを入力...',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                    ),
-                    maxLines: null,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  color: Colors.green,
-                  onPressed: _sendMessage,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTemplateButton(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: OutlinedButton(
-        onPressed: () {
-          _messageController.text = text;
-        },
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        ),
-        child: Text(
-          text,
-          style: const TextStyle(fontSize: 12),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMessageBubble(ChatMessageModel message) {
-    final isMe = message.senderId == 'current_user';
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-        children: [
-          if (!isMe) ...[
-            CircleAvatar(
-              radius: 16,
-              child: Text(message.senderName[0]),
-            ),
-            const SizedBox(width: 8),
-          ],
-          Flexible(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: isMe ? Colors.green.shade100 : Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(16),
-              ),
+      backgroundColor: const Color(0xFFFDFEFF), // Figmaデザインの背景色
+      body: SafeArea(
+        child: Column(
+          children: [
+            // ヘッダー部分
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (!isMe)
-                    Text(
-                      message.senderName,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  Text(message.content),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${message.timestamp.hour}:${message.timestamp.minute.toString().padLeft(2, '0')}',
+                  const Text(
+                    'チャット',
                     style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey.shade600,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                      letterSpacing: -0.24,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // 相手の名前・グループ名
+                  Center(
+                    child: Text(
+                      widget.room.name,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black,
+                        letterSpacing: -0.24,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-          if (isMe) ...[
-            const SizedBox(width: 8),
-            CircleAvatar(
-              radius: 16,
-              child: const Text('私'),
+            const Divider(height: 1),
+            // メッセージリスト
+            Expanded(
+              child: _messages.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'メッセージがありません',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    )
+                  : ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) {
+                        final message = _messages[index];
+                        final isMe = message.senderId == 'current_user';
+                        return MessageBubble(
+                          message: message.content,
+                          isFromMe: isMe,
+                          senderName: isMe ? null : message.senderName,
+                          timestamp: message.timestamp,
+                          avatarType: isMe
+                              ? null
+                              : _getAvatarTypeForSender(message.senderId),
+                        );
+                      },
+                    ),
+            ),
+            // クイックリプライボタン
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 16, 0, 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0x5656771A).withOpacity(0.1),
+                    offset: const Offset(0, -7),
+                    blurRadius: 6.6,
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  QuickReplyButton(
+                    text: '承知しました！👍',
+                    onTap: () => _sendQuickReply('承知しました！👍'),
+                  ),
+                  const SizedBox(width: 10),
+                  QuickReplyButton(
+                    text: 'ありがとうございます😊',
+                    onTap: () => _sendQuickReply('ありがとうございます😊'),
+                  ),
+                  const SizedBox(width: 10),
+                  QuickReplyButton(
+                    text: 'よろしくお願いします',
+                    onTap: () => _sendQuickReply('よろしくお願いします'),
+                  ),
+                ],
+              ),
+            ),
+            // メッセージ入力欄
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0x5656771A).withOpacity(0.1),
+                    offset: const Offset(0, -7),
+                    blurRadius: 6.6,
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: const Color(0xFFD8D8D8)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: const InputDecoration(
+                          hintText: 'メッセージを入力してください',
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF8A8A8A),
+                            letterSpacing: -0.408,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 7,
+                          ),
+                        ),
+                        maxLines: null,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 9),
+                  // 送信ボタン
+                  GestureDetector(
+                    onTap: _sendMessage,
+                    child: Container(
+                      width: 49,
+                      height: 36,
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0082E1), // ACCカラー
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: SvgPicture.network(
+                        imgSend,
+                        width: 24,
+                        height: 24,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
-        ],
+        ),
       ),
     );
+  }
+
+  UserAvatarType? _getAvatarTypeForSender(String senderId) {
+    // 送信者IDに基づいてアバタータイプを決定
+    // TODO: 実際のユーザー情報から取得
+    switch (senderId) {
+      case 'user1':
+        return UserAvatarType.defaultCat;
+      case 'user2':
+        return UserAvatarType.alien;
+      case 'user3':
+        return UserAvatarType.robot;
+      default:
+        return UserAvatarType.defaultCat;
+    }
+  }
+
+  void _sendQuickReply(String text) {
+    _messageController.text = text;
+    _sendMessage();
   }
 
   void _sendMessage() {
@@ -244,11 +288,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     });
 
     _messageController.clear();
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
+    // スクロールを最下部に移動
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 }
 
