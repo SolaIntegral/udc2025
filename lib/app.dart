@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'features/onboarding/presentation/pages/onboarding_page.dart';
 import 'features/home/presentation/pages/home_page.dart';
+import 'features/map/presentation/pages/map_page.dart';
 import 'features/group/presentation/pages/group_list_page.dart';
 import 'features/group/presentation/pages/group_create_page.dart';
 import 'features/group/presentation/pages/group_member_add_page.dart';
@@ -25,6 +26,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         builder: (context, state) => const HomePage(),
+      ),
+      GoRoute(
+        path: '/map',
+        builder: (context, state) => const MapPage(),
       ),
       GoRoute(
         path: '/groups',
