@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../info/presentation/pages/info_page.dart';
 import '../../../communication/presentation/pages/communication_page.dart';
 import '../../../map/presentation/pages/map_page.dart';
+import '../../../emergency/presentation/pages/emergency_status_page.dart';
 
 /// ホーム画面
-/// BottomNavigationBarで3つの画面を切り替え
-class HomePage extends StatefulWidget {
+/// BottomNavigationBarで画面を切り替える
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = const [
     InfoPage(),
     CommunicationPage(),
     MapPage(),
+    EmergencyStatusPage(), // 防災準備（設定用）
   ];
 
   @override
@@ -38,26 +42,24 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.info_outline),
             activeIcon: Icon(Icons.info),
             label: '情報',
-            backgroundColor: Colors.purple,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat_bubble_outline),
             activeIcon: Icon(Icons.chat_bubble),
             label: 'コミュニティ',
-            backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.map_outlined),
             activeIcon: Icon(Icons.map),
             label: 'マップ',
-            backgroundColor: Colors.green,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.backpack_outlined),
+            activeIcon: Icon(Icons.backpack),
+            label: '防災準備',
           ),
         ],
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.grey.shade900,
       ),
     );
   }
 }
-
