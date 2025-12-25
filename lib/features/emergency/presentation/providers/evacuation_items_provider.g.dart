@@ -6,7 +6,7 @@ part of 'evacuation_items_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$evacuationItemsHash() => r'dd3b6ae55d7db374d040bd8e12d1e6cf8e5895c6';
+String _$evacuationItemsHash() => r'7553f451a38cce08d867f197894f016779caced6';
 
 /// 持ち出し品チェックリストの状態管理プロバイダー
 ///

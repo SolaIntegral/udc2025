@@ -7,7 +7,7 @@ part of 'emergency_preparedness_provider.dart';
 // **************************************************************************
 
 String _$emergencyPreparednessHash() =>
-    r'39c1f7c92fd8224bdea55c9b25e922090871333f';
+    r'75348bb989e32ace3a7965e3b507f1ab8bbd7ddd';
 
 /// 防災準備（持ち出し品・緊急連絡先）Provider
 ///

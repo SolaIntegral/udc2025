@@ -13,32 +13,32 @@ class EvacuationItems extends _$EvacuationItems {
       EvacuationItem(
         id: 'water',
         name: '飲料水',
-        isChecked: false,
+        checked: false,
       ),
       EvacuationItem(
         id: 'food',
         name: '非常食',
-        isChecked: false,
+        checked: false,
       ),
       EvacuationItem(
         id: 'phone',
         name: '携帯電話・充電器',
-        isChecked: false,
+        checked: false,
       ),
       EvacuationItem(
         id: 'light',
         name: '懐中電灯',
-        isChecked: false,
+        checked: false,
       ),
       EvacuationItem(
         id: 'medicine',
         name: '常備薬',
-        isChecked: false,
+        checked: false,
       ),
       EvacuationItem(
         id: 'id_card',
         name: '身分証明書',
-        isChecked: false,
+        checked: false,
       ),
     ];
   }
@@ -48,7 +48,7 @@ class EvacuationItems extends _$EvacuationItems {
     state = [
       for (final item in state)
         if (item.id == id)
-          item.copyWith(isChecked: !item.isChecked)
+          item.copyWith(checked: !item.checked)
         else
           item,
     ];
@@ -59,7 +59,7 @@ class EvacuationItems extends _$EvacuationItems {
     final newItem = EvacuationItem(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,
-      isChecked: false,
+      checked: false,
     );
     state = [...state, newItem];
   }
@@ -72,7 +72,7 @@ class EvacuationItems extends _$EvacuationItems {
   /// 全て未チェックに戻す
   void resetAll() {
     state = [
-      for (final item in state) item.copyWith(isChecked: false),
+      for (final item in state) item.copyWith(checked: false),
     ];
   }
 }
