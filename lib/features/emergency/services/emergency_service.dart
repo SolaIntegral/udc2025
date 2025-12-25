@@ -39,12 +39,10 @@ class EmergencyService {
   }
 
   /// SOSを発信
-  Future<bool> sendSos(String userId, double? latitude, double? longitude) async {
+  Future<bool> sendSos(String userId) async {
     final status = EmergencyStatusModel(
       userId: userId,
       status: EmergencyStatusType.sos,
-      latitude: latitude,
-      longitude: longitude,
       timestamp: DateTime.now(),
     );
     return await sendEmergencyStatus(status);
