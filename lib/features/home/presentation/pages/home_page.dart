@@ -6,8 +6,12 @@ import '../../../communication/presentation/pages/communication_page.dart';
 import '../../../map/presentation/pages/map_page.dart';
 import '../../../emergency/presentation/pages/emergency_status_page.dart';
 
+import '../../../../core/i18n/app_strings.dart' as strings;
+import '../../../../core/providers/language_provider.dart';
+
 /// ホーム画面
 /// BottomNavigationBarで画面を切り替える
+/// 表示文言は多言語対応（LanguageProvider）
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
@@ -27,6 +31,8 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = ref.watch(languageProvider);
+
     return Scaffold(
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -37,26 +43,26 @@ class _HomePageState extends ConsumerState<HomePage> {
           });
         },
         type: BottomNavigationBarType.fixed,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.info_outline),
-            activeIcon: Icon(Icons.info),
-            label: '情報',
+            icon: const Icon(Icons.info_outline),
+            activeIcon: const Icon(Icons.info),
+            label: strings.t('tab_info', lang),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            activeIcon: Icon(Icons.chat_bubble),
-            label: 'コミュニティ',
+            icon: const Icon(Icons.chat_bubble_outline),
+            activeIcon: const Icon(Icons.chat_bubble),
+            label: strings.t('tab_community', lang),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.map_outlined),
-            activeIcon: Icon(Icons.map),
-            label: 'マップ',
+            icon: const Icon(Icons.map_outlined),
+            activeIcon: const Icon(Icons.map),
+            label: strings.t('tab_map', lang),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.backpack_outlined),
-            activeIcon: Icon(Icons.backpack),
-            label: '防災準備',
+            icon: const Icon(Icons.backpack_outlined),
+            activeIcon: const Icon(Icons.backpack),
+            label: strings.t('tab_preparedness', lang),
           ),
         ],
       ),
