@@ -113,14 +113,50 @@ class _ChatPageState extends State<ChatPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'チャット',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                      letterSpacing: -0.24,
-                    ),
+                  // ヘッダー（タイトルとアイコン）
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'チャット',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          letterSpacing: -0.24,
+                        ),
+                      ),
+                      // ユーザーアイコン（通知ドット付き）
+                      Stack(
+                        children: [
+                          Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF5F5F5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.person,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          // 通知ドット（緑）
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF00D26A),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   // 検索バー
@@ -161,7 +197,7 @@ class _ChatPageState extends State<ChatPage> {
                           isSelected: _selectedFilter == 'すべて',
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 4),
                       GestureDetector(
                         onTap: () {
                           setState(() => _selectedFilter = 'グループ');
@@ -172,7 +208,7 @@ class _ChatPageState extends State<ChatPage> {
                           isSelected: _selectedFilter == 'グループ',
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 4),
                       GestureDetector(
                         onTap: () {
                           setState(() => _selectedFilter = '掲示板');

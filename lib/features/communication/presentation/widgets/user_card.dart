@@ -41,7 +41,7 @@ class UserCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
             child: Row(
               children: [
                 // アイコン
@@ -96,7 +96,7 @@ class UserCard extends StatelessWidget {
                                 backgroundColor: _getSkillTagBackgroundColor(tagType),
                                 textColor: _getSkillTagTextColor(tagType),
                               );
-                            }).toList(),
+                            }),
                         ],
                       ),
                     ],

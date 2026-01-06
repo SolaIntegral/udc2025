@@ -5,28 +5,34 @@ import 'package:flutter/material.dart';
 class CommMenuCard extends StatelessWidget {
   final String title;
   final String description;
-  final IconData? icon;
+  final Widget? iconWidget; // SVGアイコン用のウィジェット
+  final IconData? icon; // 従来のアイコンデータ（後方互換性のため）
   final Color? iconColor;
+  final Color? iconBackgroundColor; // アイコンエリアの背景色
   final VoidCallback? onTap;
 
   const CommMenuCard({
     super.key,
     required this.title,
     required this.description,
+    this.iconWidget,
     this.icon,
     this.iconColor,
+    this.iconBackgroundColor,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    // タイトルに基づいて背景色を決定（Figmaデザインに合わせる）
+    final bgColor = iconBackgroundColor ?? _getDefaultBackgroundColor(title);
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
       child: Container(
-        height: 144,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -51,16 +57,18 @@ class CommMenuCard extends StatelessWidget {
                   width: 58,
                   height: 58,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF5F5F5),
+                    color: bgColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: icon != null
-                      ? Icon(
-                          icon,
-                          color: iconColor ?? Colors.grey,
-                          size: 32,
-                        )
-                      : null,
+                  padding: const EdgeInsets.all(13),
+                  child: iconWidget ??
+                      (icon != null
+                          ? Icon(
+                              icon,
+                              color: iconColor ?? Colors.grey,
+                              size: 32,
+                            )
+                          : null),
                 ),
                 const SizedBox(width: 21),
                 // テキスト情報
@@ -68,6 +76,7 @@ class CommMenuCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         title,
@@ -106,6 +115,20 @@ class CommMenuCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// タイトルに基づいてデフォルトの背景色を取得
+  Color _getDefaultBackgroundColor(String title) {
+    if (title.contains('周辺ユーザー') || title.contains('検索')) {
+      return const Color(0xFFFFF0F0); // オレンジ系
+    } else if (title.contains('グループ') || title.contains('安否')) {
+      return const Color(0xFFF0F4FF); // 青系
+    } else if (title.contains('プロフィール') || title.contains('支援')) {
+      return const Color(0xFFFBF0FF); // 紫系
+    } else if (title.contains('つながり')) {
+      return const Color(0xFFFBFFF0); // 黄緑系
+    }
+    return const Color(0xFFF5F5F5); // デフォルト
   }
 }
 

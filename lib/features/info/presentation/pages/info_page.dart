@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 import '../widgets/comm_notification_card.dart';
 import '../widgets/info_column_card.dart';
 import '../../../emergency/presentation/providers/emergency_preparedness_provider.dart';
@@ -41,33 +41,89 @@ class _InfoPageState extends ConsumerState<InfoPage> {
                       letterSpacing: -0.24,
                     ),
                   ),
-                  // ユーザーアイコン（プレースホルダー）
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.person,
-                      color: Colors.grey,
-                    ),
+                  // ユーザーアイコン（通知ドット付き）
+                  Stack(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F5F5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      // 通知ドット（緑）
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF00D26A),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
               const SizedBox(height: 32),
 
               // 現在の情報セクション
-              _buildSection(
-                title: '現在の情報',
-                child: CommNotificationCard(
-                  title: '地震発生',
-                  description: '地震が発生しました。安全な場所に避難してください。',
-                  onTap: () {
-                    // TODO: 詳細情報ページへ遷移
-                  },
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        '現在の情報',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          letterSpacing: -0.24,
+                        ),
+                      ),
+                      // 最終更新日時
+                      Text(
+                        '最終更新 ${_getFormattedDateTime()}',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFFD5D5D5),
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // 津波警報カード（危険タイプ）
+                  CommNotificationCard(
+                    title: '津波警報 要避難',
+                    description: '津波が発生しました。直ちに安全な場所に避難してください。',
+                    type: CommNotificationType.danger,
+                    onTap: () {
+                      // TODO: 詳細情報ページへ遷移
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  // 地震発生カード（警告タイプ）
+                  CommNotificationCard(
+                    title: '地震発生',
+                    description: '地震が発生しました。身の安全を確保して、情報を待ちましょう',
+                    type: CommNotificationType.warning,
+                    onTap: () {
+                      // TODO: 詳細情報ページへ遷移
+                    },
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
 
@@ -75,8 +131,9 @@ class _InfoPageState extends ConsumerState<InfoPage> {
               _buildSection(
                 title: '避難に関する情報',
                 child: CommNotificationCard(
-                  title: '地震発生',
-                  description: '地震が発生しました。安全な場所に避難してください。',
+                  title: '災害の情報なし',
+                  description: '現時点での災害はありません。\n日頃の意識を持ちましょう。',
+                  type: CommNotificationType.success,
                   onTap: () {
                     // TODO: 詳細情報ページへ遷移
                   },
@@ -91,12 +148,12 @@ class _InfoPageState extends ConsumerState<InfoPage> {
               ),
               const SizedBox(height: 24),
 
-              // 緊急連絡先セクション
-              _buildSection(
-                title: '緊急連絡先',
-                child: _buildEmergencyContacts(preparedness, notifier),
-              ),
-              const SizedBox(height: 24),
+              // 緊急連絡先セクション（2枚目に含まれる可能性があるため、一旦コメントアウト）
+              // _buildSection(
+              //   title: '緊急連絡先',
+              //   child: _buildEmergencyContacts(preparedness, notifier),
+              // ),
+              // const SizedBox(height: 24),
 
               // 学びのコラムセクション
               const Text(
@@ -117,6 +174,15 @@ class _InfoPageState extends ConsumerState<InfoPage> {
                     InfoColumnCard(
                       title: '適切な応急処置',
                       description: '怪我をした場合の基本的な応急処置方法を学びましょう。',
+                      image: Image.network(
+                        'http://localhost:3845/assets/e344e8860b778d7fc13f8b376acdc3533ae3566a.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Icon(Icons.image, color: Colors.grey, size: 32),
+                          );
+                        },
+                      ),
                       onTap: () {
                         // TODO: コラム詳細ページへ遷移
                       },
@@ -125,6 +191,16 @@ class _InfoPageState extends ConsumerState<InfoPage> {
                     InfoColumnCard(
                       title: '女性向け情報',
                       description: '避難所での安全対策や必要な物品について学びましょう。',
+                      imageHeight: 101, // 女性向け情報は101px
+                      image: Image.network(
+                        'http://localhost:3845/assets/9f12d372cef0312478f023ee1be5c6279cd332eb.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Icon(Icons.image, color: Colors.grey, size: 32),
+                          );
+                        },
+                      ),
                       onTap: () {
                         // TODO: コラム詳細ページへ遷移
                       },
@@ -133,6 +209,15 @@ class _InfoPageState extends ConsumerState<InfoPage> {
                     InfoColumnCard(
                       title: '過去の災害から学ぶ',
                       description: '過去の災害でどのような被害が及んだのか、学びましょう',
+                      image: Image.network(
+                        'http://localhost:3845/assets/588712f261884a9f65430f1711c51c0e9aea210d.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Icon(Icons.image, color: Colors.grey, size: 32),
+                          );
+                        },
+                      ),
                       onTap: () {
                         // TODO: コラム詳細ページへ遷移
                       },
@@ -182,7 +267,7 @@ class _InfoPageState extends ConsumerState<InfoPage> {
     );
   }
 
-  /// 持ち出し品チェックリスト
+  /// 持ち出し品チェックリスト（Figmaデザインに合わせて実装）
   Widget _buildEvacuationItems(
       EmergencyPreparednessState preparedness, EmergencyPreparedness notifier) {
     return Card(
@@ -203,59 +288,12 @@ class _InfoPageState extends ConsumerState<InfoPage> {
             ),
           ],
         ),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  '※ 平常時に防災用品を準備・編集できます',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-                TextButton.icon(
-                  onPressed: _showAddItemDialog,
-                  icon: const Icon(Icons.add, size: 16),
-                  label: const Text('追加'),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
             ...preparedness.items.map(
-              (item) => Row(
-                children: [
-                  Expanded(
-                    child: CheckboxListTile(
-                      value: item.checked,
-                      title: Text(
-                        item.name,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      onChanged: (_) {
-                        notifier.toggleItem(item.id);
-                      },
-                      controlAffinity: ListTileControlAffinity.leading,
-                      dense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                    onPressed: () {
-                      notifier.removeItem(item.id);
-                    },
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
+              (item) => _buildEvacuationItemRow(item, notifier),
             ),
           ],
         ),
@@ -263,188 +301,78 @@ class _InfoPageState extends ConsumerState<InfoPage> {
     );
   }
 
-  /// 緊急連絡先リスト
-  Widget _buildEmergencyContacts(
-      EmergencyPreparednessState preparedness, EmergencyPreparedness notifier) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF2B3452).withOpacity(0.03),
-              offset: const Offset(0, 0),
-              blurRadius: 29.8,
-              spreadRadius: 10,
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  /// 持ち出し品アイテムの行（Figmaデザインに合わせて実装）
+  Widget _buildEvacuationItemRow(
+      dynamic item, EmergencyPreparedness notifier) {
+    final isChecked = item.checked;
+    final iconBackgroundColor =
+        isChecked ? const Color(0xFFEDFFE5) : const Color(0xFFF4F4F4);
+
+    return InkWell(
+      onTap: () => notifier.toggleItem(item.id),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 14),
+        child: Row(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox.shrink(),
-                TextButton.icon(
-                  onPressed: _showAddContactDialog,
-                  icon: const Icon(Icons.add, size: 16),
-                  label: const Text('追加'),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            ...preparedness.contacts.map(
-              (contact) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        contact.name,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
+            const SizedBox(width: 16),
+            // アイコンエリア
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: iconBackgroundColor,
+                borderRadius: BorderRadius.circular(5.793),
+              ),
+              padding: const EdgeInsets.all(9.414),
+              child: isChecked
+                  ? const Icon(
+                      Icons.check,
+                      color: Color(0xFF00D26A),
+                      size: 24,
+                    )
+                  : Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD0D0D0),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          contact.phone,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: const Icon(Icons.phone, size: 20),
-                          onPressed: () async {
-                            final uri = Uri.parse('tel:${contact.phone}');
-                            if (await canLaunchUrl(uri)) {
-                              await launchUrl(uri);
-                            }
-                          },
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                          onPressed: () {
-                            notifier.removeContact(contact.name);
-                          },
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
-                    ),
-                  ],
+            ),
+            const SizedBox(width: 30),
+            // アイテム名
+            Expanded(
+              child: Text(
+                item.name,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2F3244),
+                  letterSpacing: -0.24,
                 ),
               ),
             ),
+            const SizedBox(width: 30),
+            // 削除アイコン
+            GestureDetector(
+              onTap: () => notifier.removeItem(item.id),
+              child: const Icon(
+                Icons.delete_outline,
+                size: 16,
+                color: Color(0xFF838383),
+              ),
+            ),
+            const SizedBox(width: 16),
           ],
         ),
       ),
     );
   }
 
-  void _showAddItemDialog() {
-    final controller = TextEditingController();
-    final notifier = ref.read(emergencyPreparednessProvider.notifier);
-
-    showDialog(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          title: const Text('持ち出し品を追加'),
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(
-              hintText: '例：眼鏡、ペット用品',
-            ),
-            autofocus: true,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('キャンセル'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final text = controller.text.trim();
-                if (text.isNotEmpty) {
-                  notifier.addItem(text);
-                }
-                Navigator.pop(context);
-              },
-              child: const Text('追加'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showAddContactDialog() {
-    final nameController = TextEditingController();
-    final numberController = TextEditingController();
-    final notifier = ref.read(emergencyPreparednessProvider.notifier);
-
-    showDialog(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          title: const Text('緊急連絡先を追加'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  hintText: '名前（例：家族、会社）',
-                ),
-                autofocus: true,
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: numberController,
-                decoration: const InputDecoration(
-                  hintText: '電話番号',
-                ),
-                keyboardType: TextInputType.phone,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('キャンセル'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final name = nameController.text.trim();
-                final number = numberController.text.trim();
-                if (name.isNotEmpty && number.isNotEmpty) {
-                  notifier.addContact(name, number);
-                }
-                Navigator.pop(context);
-              },
-              child: const Text('追加'),
-            ),
-          ],
-        );
-      },
-    );
+  /// フォーマットされた日時を取得
+  String _getFormattedDateTime() {
+    final now = DateTime.now();
+    final formatter = DateFormat('yyyy/MM/dd/HHmm');
+    return formatter.format(now);
   }
 }

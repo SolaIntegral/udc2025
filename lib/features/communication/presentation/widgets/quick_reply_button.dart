@@ -17,22 +17,40 @@ class QuickReplyButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+        height: 30,
+        padding: EdgeInsets.symmetric(
+          horizontal: _getHorizontalPadding(text),
+          vertical: 6,
+        ),
         decoration: BoxDecoration(
           color: const Color(0xFFF2F2F2),
           borderRadius: BorderRadius.circular(40),
         ),
-        child: Text(
-          text,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF8A8A8A),
-            height: 1.33,
+        child: Center(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF8A8A8A),
+              height: 1.33,
+            ),
           ),
         ),
       ),
     );
+  }
+
+  double _getHorizontalPadding(String text) {
+    // テキストの長さに応じてパディングを調整（Figmaデザインに合わせて）
+    if (text.contains('承知しました')) {
+      return 14;
+    } else if (text.contains('ありがとう')) {
+      return 18;
+    } else if (text.contains('よろしく')) {
+      return 18;
+    }
+    return 18; // デフォルト
   }
 }
 

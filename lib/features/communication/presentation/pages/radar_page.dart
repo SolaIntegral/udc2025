@@ -122,26 +122,63 @@ class _RadarPageState extends State<RadarPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 32), // ステータスバーとタイトル間のスペース
+                  // ヘッダー（タイトルとアイコン）
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
                         'コミュニティ',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 24,
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
                           letterSpacing: -0.24,
                         ),
                       ),
-                      Container(
-                        width: 111,
-                        height: 13,
-                        color: const Color(0xFFF7F7F7), // プレースホルダーの色
+                      // ユーザーアイコン（通知ドット付き）
+                      Stack(
+                        children: [
+                          Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF5F5F5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.person,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          // 通知ドット（緑）
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF00D26A),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 32),
+                  // セクションタイトル
+                  const Text(
+                    '周辺ユーザー検索',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                      letterSpacing: -0.24,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                   // 言語フィルター
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,

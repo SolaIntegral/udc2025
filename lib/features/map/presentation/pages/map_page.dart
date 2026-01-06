@@ -14,32 +14,6 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   // 模擬「是否已經下載離線地圖」的狀態
   bool isOfflineReady = false;
-  bool isDownloading = false;
-
-  // 模擬下載過程
-  Future<void> _simulateDownload() async {
-    setState(() {
-      isDownloading = true;
-    });
-
-    // 假裝跑 2 秒鐘進度
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      setState(() {
-        isDownloading = false;
-        isOfflineReady = true; // 狀態變為「已下載」
-      });
-
-      // 跳出成功提示 (日文)
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("オフラインマップのダウンロードが完了しました"), // 下載完成
-          backgroundColor: Colors.green,
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,45 +34,80 @@ class _MapPageState extends State<MapPage> {
     ];
 
     // 4. 定義「離線區域」的範圍
-    final offlineRegion = [
-      LatLng(35.6850, 139.7600), // 左上
-      LatLng(35.6850, 139.7680), // 右上
-      LatLng(35.6800, 139.7680), // 右下
-      LatLng(35.6800, 139.7600), // 左下
-    ];
+    // TODO: オフラインマップ機能を実装する際に使用
+    // final offlineRegion = [
+    //   LatLng(35.6850, 139.7600), // 左上
+    //   LatLng(35.6850, 139.7680), // 右上
+    //   LatLng(35.6800, 139.7680), // 右下
+    //   LatLng(35.6800, 139.7600), // 左下
+    // ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('災害時避難経路'), // 標題：災害時避難路徑
-        backgroundColor: isOfflineReady ? Colors.green[700] : Colors.red[800],
-        foregroundColor: Colors.white,
-        actions: [
-          // 右上角的「模擬下載」按鈕
-          if (!isOfflineReady)
-            IconButton(
-              icon: isDownloading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  : const Icon(Icons.download_for_offline),
-              tooltip: "地図をダウンロード", // 提示：下載地圖
-              onPressed: isDownloading ? null : _simulateDownload,
-            ),
-          if (isOfflineReady)
-            const Padding(
-              padding: EdgeInsets.only(right: 16.0),
-              child: Icon(Icons.check_circle, color: Colors.white),
-            ),
-        ],
-      ),
-      body: Stack(
+      backgroundColor: const Color(0xFFFDFEFF), // Figmaデザインの背景色
+      body: SafeArea(
+        child: Stack(
         children: [
-          FlutterMap(
+          // ヘッダー部分
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+              color: const Color(0xFFFDFEFF),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'マップ',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                      letterSpacing: -0.24,
+                    ),
+                  ),
+                  // ユーザーアイコン（通知ドット付き）
+                  Stack(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F5F5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      // 通知ドット（緑）
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF00D26A),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // マップエリア（ヘッダーの下から開始）
+          Positioned(
+            top: 66, // ヘッダーの高さ分
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: FlutterMap(
             options: MapOptions(
               initialCenter: LatLng(35.6825, 139.7635),
               initialZoom: 16.0,
@@ -110,18 +119,19 @@ class _MapPageState extends State<MapPage> {
               ),
 
               // --- 離線區域框 (下載後顯示) ---
-              if (isOfflineReady)
-                PolygonLayer(
-                  polygons: [
-                    Polygon(
-                      points: offlineRegion,
-                      color: Colors.green.withOpacity(0.1),
-                      borderColor: Colors.green,
-                      borderStrokeWidth: 2,
-                      isFilled: true,
-                    ),
-                  ],
-                ),
+              // TODO: オフラインマップ機能を実装する際に有効化
+              // if (isOfflineReady)
+              //   PolygonLayer(
+              //     polygons: [
+              //       Polygon(
+              //         points: offlineRegion,
+              //         color: Colors.green.withOpacity(0.1),
+              //         borderColor: Colors.green,
+              //         borderStrokeWidth: 2,
+              //         isFilled: true,
+              //       ),
+              //     ],
+              //   ),
 
               PolylineLayer(
                 polylines: [
@@ -254,35 +264,133 @@ class _MapPageState extends State<MapPage> {
                 ],
               ),
             ],
+            ),
           ),
 
-          // --- 下方浮動提示 (離線模式) ---
-          if (isOfflineReady)
-            Positioned(
-              bottom: 20,
-              left: 20,
-              right: 20,
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.black87,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.wifi_off, color: Colors.white, size: 20),
-                    SizedBox(width: 10),
-                    Text(
-                      "オフラインモード起動中", // 顯示：Offline Mode Active
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
+          // 家族ステータスカード（下部に表示）
+          Positioned(
+            bottom: 20,
+            left: 20,
+            right: 20,
+            child: _buildFamilyStatusCard(),
+          ),
+        ],
+        ),
+      ),
+    );
+  }
+
+  /// 家族ステータスカードを構築
+  Widget _buildFamilyStatusCard() {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF2B3452).withOpacity(0.03),
+              offset: const Offset(0, 0),
+              blurRadius: 29.8,
+              spreadRadius: 10,
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            // アイコン（緑背景、チェックマーク）
+            Container(
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEDFFE5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.all(13),
+              child: const Icon(
+                Icons.check_circle,
+                color: Color(0xFF00D26A),
+                size: 32,
               ),
             ),
-        ],
+            const SizedBox(width: 21),
+            // テキスト情報
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 名前と距離・バッテリー情報
+                  Row(
+                    children: [
+                      const Text(
+                        '母(mom)',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF2F3244),
+                          letterSpacing: -0.24,
+                        ),
+                      ),
+                      const Spacer(),
+                      const Icon(
+                        Icons.location_on,
+                        size: 16,
+                        color: Color(0xFF838383),
+                      ),
+                      const SizedBox(width: 2),
+                      const Text(
+                        '26m',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF838383),
+                          letterSpacing: -0.24,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(
+                        Icons.battery_5_bar,
+                        size: 16,
+                        color: Color(0xFF838383),
+                      ),
+                      const SizedBox(width: 2),
+                      const Text(
+                        '85%',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF838383),
+                          letterSpacing: -0.24,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // メッセージ
+                  const Text(
+                    '避難所に到着しました。無事です。',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF2F3244),
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 21),
+            // 右矢印アイコン
+            const Icon(
+              Icons.chevron_right,
+              size: 16,
+              color: Color(0xFF838383),
+            ),
+          ],
+        ),
       ),
     );
   }

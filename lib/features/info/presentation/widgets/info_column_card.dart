@@ -6,6 +6,7 @@ class InfoColumnCard extends StatelessWidget {
   final String title;
   final String description;
   final Widget? image;
+  final double? imageHeight; // 画像の高さ（Figmaデザインに合わせて調整可能）
   final VoidCallback? onTap;
 
   const InfoColumnCard({
@@ -13,11 +14,15 @@ class InfoColumnCard extends StatelessWidget {
     required this.title,
     required this.description,
     this.image,
+    this.imageHeight,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    // タイトルに基づいて画像の高さを決定（Figmaデザインに合わせる）
+    final height = imageHeight ?? _getDefaultImageHeight(title);
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -25,7 +30,6 @@ class InfoColumnCard extends StatelessWidget {
       ),
       child: Container(
         width: 165,
-        height: 162,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -43,10 +47,12 @@ class InfoColumnCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
             children: [
               // 画像エリア
               Container(
-                height: 97,
+                height: height,
+                width: 165,
                 decoration: const BoxDecoration(
                   color: Color(0xFFD9D9D9),
                   borderRadius: BorderRadius.only(
@@ -65,7 +71,7 @@ class InfoColumnCard extends StatelessWidget {
               ),
               // テキスト情報
               Padding(
-                padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -75,7 +81,7 @@ class InfoColumnCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF2F3244),
+                        color: Color(0xFF4C5066),
                         letterSpacing: -0.24,
                       ),
                     ),
@@ -85,8 +91,8 @@ class InfoColumnCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 8,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF2F3244),
-                        height: 1.3,
+                        color: Color(0xFF4C5066),
+                        height: 1.5,
                       ),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
@@ -99,6 +105,14 @@ class InfoColumnCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// タイトルに基づいてデフォルトの画像の高さを取得
+  double _getDefaultImageHeight(String title) {
+    if (title.contains('女性')) {
+      return 101; // バリアント2: 101px
+    }
+    return 97; // デフォルト・バリアント3: 97px
   }
 }
 

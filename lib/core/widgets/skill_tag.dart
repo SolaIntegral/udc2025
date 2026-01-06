@@ -21,7 +21,7 @@ class SkillTag extends StatelessWidget {
     final (bgColor, txtColor) = _getColors();
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 9.6, vertical: 2.4),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(2),
@@ -29,7 +29,7 @@ class SkillTag extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: FontWeight.w500,
           color: txtColor,
           letterSpacing: -0.24,

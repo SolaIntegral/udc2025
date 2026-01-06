@@ -46,7 +46,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           id: 'msg1',
           senderId: 'user1',
           senderName: '田中 太郎',
-          content: 'こんにちは、大丈夫ですか？',
+          content: '大丈夫ですか？',
           type: ChatMessageType.text,
           timestamp: DateTime.now().subtract(const Duration(minutes: 10)),
           roomId: widget.room.id,
@@ -54,9 +54,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         ),
         ChatMessageModel(
           id: 'msg2',
-          senderId: 'current_user',
-          senderName: '私',
-          content: 'はい、無事です。ありがとうございます。',
+          senderId: 'user2',
+          senderName: '田中真弓',
+          content: '大丈夫ですか？',
           type: ChatMessageType.text,
           timestamp: DateTime.now().subtract(const Duration(minutes: 9)),
           roomId: widget.room.id,
@@ -64,9 +64,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         ),
         ChatMessageModel(
           id: 'msg3',
-          senderId: 'user1',
-          senderName: '田中 太郎',
-          content: '良かったです。何か必要なものがあれば教えてください。',
+          senderId: 'current_user',
+          senderName: '私',
+          content: '私は大丈夫！\n2人とも大丈夫？',
           type: ChatMessageType.text,
           timestamp: DateTime.now().subtract(const Duration(minutes: 8)),
           roomId: widget.room.id,
@@ -84,7 +84,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         child: Column(
           children: [
             // ヘッダー部分
-            Container(
+            Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,22 +99,78 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // 相手の名前・グループ名
-                  Center(
+                  // グループ情報（アバター、名前、メンバー）
+                  Row(
+                    children: [
+                      UserAvatarIcon(
+                        type: _getAvatarTypeForRoom(widget.room),
+                        size: 58,
+                      ),
+                      const SizedBox(width: 11),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.room.name,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF2F3244),
+                                letterSpacing: -0.24,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _getMemberList(widget.room),
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF2F3244),
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            // 日付セパレーター
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Divider(
+                      height: 1,
+                      color: const Color(0xFFD5D5D5),
+                      thickness: 1,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
-                      widget.room.name,
+                      _formatDate(DateTime.now()),
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w400,
-                        color: Colors.black,
-                        letterSpacing: -0.24,
+                        color: Color(0xFFD5D5D5),
                       ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Divider(
+                      height: 1,
+                      color: const Color(0xFFD5D5D5),
+                      thickness: 1,
                     ),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1),
             // メッセージリスト
             Expanded(
               child: _messages.isEmpty
@@ -138,7 +194,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           timestamp: message.timestamp,
                           avatarType: isMe
                               ? null
-                              : _getAvatarTypeForSender(message.senderId),
+                              : _getAvatarTypeForSender(message.senderId, message.senderName),
                         );
                       },
                     ),
@@ -249,19 +305,54 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
-  UserAvatarType? _getAvatarTypeForSender(String senderId) {
-    // 送信者IDに基づいてアバタータイプを決定
-    // TODO: 実際のユーザー情報から取得
-    switch (senderId) {
-      case 'user1':
-        return UserAvatarType.defaultCat;
-      case 'user2':
-        return UserAvatarType.alien;
-      case 'user3':
-        return UserAvatarType.robot;
-      default:
-        return UserAvatarType.defaultCat;
+  UserAvatarType _getAvatarTypeForRoom(ChatRoomModel room) {
+    // チャットルーム名に基づいてアバタータイプを決定
+    if (room.name.contains('田中家')) {
+      return UserAvatarType.defaultCat;
+    } else if (room.name.contains('John')) {
+      return UserAvatarType.alien;
+    } else if (room.name.contains('山田')) {
+      return UserAvatarType.defaultCat;
     }
+    return UserAvatarType.defaultCat;
+  }
+
+  String _getMemberList(ChatRoomModel room) {
+    // グループチャットの場合、メンバーリストを返す
+    if (room.type == ChatRoomType.group) {
+      // TODO: 実際のメンバー情報から取得
+      if (room.name.contains('田中家')) {
+        return '田中太郎、田中梨子、田中真弓';
+      }
+      return 'メンバー1、メンバー2、メンバー3';
+    }
+    // 1対1チャットの場合は相手の名前のみ
+    return room.name;
+  }
+
+  String _formatDate(DateTime date) {
+    // 日付を「2025/12/22/0921」形式でフォーマット
+    final year = date.year;
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '$year/$month/$day/$hour$minute';
+  }
+
+  UserAvatarType? _getAvatarTypeForSender(String senderId, String? senderName) {
+    // 送信者名に基づいてアバタータイプを決定
+    if (senderName != null) {
+      if (senderName.contains('田中 太郎')) {
+        return UserAvatarType.robot; // 田中 太郎はロボット
+      } else if (senderName.contains('田中真弓')) {
+        return UserAvatarType.alien; // 田中真弓はエイリアン
+      } else if (senderName.contains('山田')) {
+        return UserAvatarType.defaultCat;
+      }
+    }
+    // デフォルト
+    return UserAvatarType.defaultCat;
   }
 
   void _sendQuickReply(String text) {
