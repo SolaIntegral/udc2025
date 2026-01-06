@@ -7,8 +7,12 @@ import '../../../communication/presentation/pages/chat_page.dart';
 import '../../../map/presentation/pages/map_page.dart';
 import '../../../../core/widgets/custom_bottom_nav_bar.dart';
 
+import '../../../../core/i18n/app_strings.dart' as strings;
+import '../../../../core/providers/language_provider.dart';
+
 /// ホーム画面
 /// BottomNavigationBarで画面を切り替える
+/// 表示文言は多言語対応（LanguageProvider）
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
@@ -28,6 +32,8 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = ref.watch(languageProvider);
+
     return Scaffold(
       body: _pages[_currentIndex],
       bottomNavigationBar: CustomBottomNavBar(

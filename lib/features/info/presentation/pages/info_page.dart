@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../widgets/comm_notification_card.dart';
 import '../widgets/info_column_card.dart';
 import '../../../emergency/presentation/providers/emergency_preparedness_provider.dart';
+import '../../../../core/providers/language_provider.dart';
+import '../../../../core/i18n/app_strings.dart';
 
 /// 情報・更新画面（ホーム画面）
 /// 災害情報、避難情報、学びのコラム、持ち出し品チェックリスト、緊急連絡先などを表示
@@ -222,7 +224,7 @@ class _InfoPageState extends ConsumerState<InfoPage> {
                         // TODO: コラム詳細ページへ遷移
                       },
                     ),
-                  ],
+                  ),
                 ),
               ),
               const SizedBox(height: 32),
@@ -375,4 +377,67 @@ class _InfoPageState extends ConsumerState<InfoPage> {
     final formatter = DateFormat('yyyy/MM/dd/HHmm');
     return formatter.format(now);
   }
+}
+
+/// 右上の言語切替ウィジェット
+/// ボタン直下に選択肢を表示する（PopupMenu）
+class _LanguageSwitcher extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(languageProvider);
+
+    return PopupMenuButton<AppLanguage>(
+      offset: const Offset(0, 36), // ボタンの少し下に表示
+      onSelected: (selected) {
+        ref.read(languageProvider.notifier).setLanguage(selected);
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: AppLanguage.ja,
+          child: const Text('日語'),
+        ),
+        PopupMenuItem(
+          value: AppLanguage.en,
+          child: const Text('English'),
+        ),
+        PopupMenuItem(
+          value: AppLanguage.zh,
+          child: const Text('简体中文'),
+        ),
+        PopupMenuItem(
+          value: AppLanguage.ko,
+          child: const Text('한국어'),
+        ),
+      ],
+      child: Material(
+        elevation: 2,
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Row(
+            children: [
+              const Icon(Icons.language, size: 18),
+              const SizedBox(width: 4),
+              Text(_currentLabel(lang)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 現在選択中の言語表示
+  String _currentLabel(AppLanguage lang) {
+  switch (lang) {
+    case AppLanguage.ja:
+      return '日語';
+    case AppLanguage.en:
+      return 'English';
+    case AppLanguage.zh:
+      return '简体中文';
+    case AppLanguage.ko:
+      return '한국어';
+  }
+}
 }
