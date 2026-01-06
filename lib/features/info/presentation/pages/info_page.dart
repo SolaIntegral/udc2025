@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import '../widgets/comm_notification_card.dart';
+import '../widgets/info_column_card.dart';
 import '../../../emergency/presentation/providers/emergency_preparedness_provider.dart';
 import '../../../../core/providers/language_provider.dart';
 import '../../../../core/i18n/app_strings.dart';
 
-/// 情報・更新画面（紫のヘッダー）
-/// 災害情報、避難情報、最終更新日時などを表示
+/// 情報・更新画面（ホーム画面）
+/// 災害情報、避難情報、学びのコラム、持ち出し品チェックリスト、緊急連絡先などを表示
 class InfoPage extends ConsumerStatefulWidget {
   const InfoPage({super.key});
 
@@ -16,346 +19,363 @@ class InfoPage extends ConsumerStatefulWidget {
 class _InfoPageState extends ConsumerState<InfoPage> {
   @override
   Widget build(BuildContext context) {
-    final lang = ref.watch(languageProvider);
+    final preparedness = ref.watch(emergencyPreparednessProvider);
+    final notifier = ref.read(emergencyPreparednessProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t('info_title', lang)),
-        backgroundColor: Colors.purple,
-        foregroundColor: Colors.white,
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 最終更新日時
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.update, color: Colors.purple),
-                        const SizedBox(width: 8),
-                        Text(
-                          t('last_updated', lang),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          DateTime.now().toString().substring(0, 19),
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                      ],
+      backgroundColor: const Color(0xFFFDFEFF),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ヘッダー（タイトルとアイコン）
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'ホーム',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                      letterSpacing: -0.24,
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-
-                // 現在の災害状況
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          t('current_disaster', lang),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  // ユーザーアイコン（通知ドット付き）
+                  Stack(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F5F5),
+                          shape: BoxShape.circle,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          t('earthquake_message', lang),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.red.shade50,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.red.shade200),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.warning, color: Colors.red),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  t('evacuation_required', lang),
-                                  style: const TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // 防災準備
-                Consumer(
-                  builder: (context, ref, _) {
-                    final preparedness =
-                        ref.watch(emergencyPreparednessProvider);
-
-                    return Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              t('evacuation_check', lang),
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-
-                            Text(
-                              t('evacuation_items', lang),
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 8),
-                            ...preparedness.items.map(
-                              (item) => Row(
-                                children: [
-                                  Checkbox(
-                                    value: item.checked,
-                                    onChanged: (_) {
-                                      ref
-                                          .read(
-                                              emergencyPreparednessProvider
-                                                  .notifier)
-                                          .toggleItem(item.id);
-                                    },
-                                  ),
-                                  Expanded(child: Text(item.name)),
-                                ],
-                              ),
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            Text(
-                              t('emergency_contacts', lang),
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 8),
-                            ...preparedness.contacts.map(
-                              (contact) => InkWell(
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: Text(t('calling', lang)),
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Icon(Icons.phone_in_talk,
-                                                size: 48,
-                                                color: Colors.green),
-                                            const SizedBox(height: 12),
-                                            Text(
-                                              '${contact.name}${t('calling_suffix', lang)}',
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              contact.phone,
-                                              style: const TextStyle(
-                                                  color: Colors.grey),
-                                            ),
-                                          ],
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
-                                            child: Text(t('cancel', lang)),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 4.0),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.phone,
-                                          size: 18, color: Colors.green),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        '${contact.name}：${contact.phone}',
-                                        style: const TextStyle(
-                                          decoration:
-                                              TextDecoration.underline,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.grey,
                         ),
                       ),
-                    );
+                      // 通知ドット（緑）
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF00D26A),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+
+              // 現在の情報セクション
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        '現在の情報',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          letterSpacing: -0.24,
+                        ),
+                      ),
+                      // 最終更新日時
+                      Text(
+                        '最終更新 ${_getFormattedDateTime()}',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFFD5D5D5),
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // 津波警報カード（危険タイプ）
+                  CommNotificationCard(
+                    title: '津波警報 要避難',
+                    description: '津波が発生しました。直ちに安全な場所に避難してください。',
+                    type: CommNotificationType.danger,
+                    onTap: () {
+                      // TODO: 詳細情報ページへ遷移
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  // 地震発生カード（警告タイプ）
+                  CommNotificationCard(
+                    title: '地震発生',
+                    description: '地震が発生しました。身の安全を確保して、情報を待ちましょう',
+                    type: CommNotificationType.warning,
+                    onTap: () {
+                      // TODO: 詳細情報ページへ遷移
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // 避難に関する情報セクション
+              _buildSection(
+                title: '避難に関する情報',
+                child: CommNotificationCard(
+                  title: '災害の情報なし',
+                  description: '現時点での災害はありません。\n日頃の意識を持ちましょう。',
+                  type: CommNotificationType.success,
+                  onTap: () {
+                    // TODO: 詳細情報ページへ遷移
                   },
                 ),
-                const SizedBox(height: 16),
+              ),
+              const SizedBox(height: 24),
 
-                // 避難情報
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          t('evacuation_info', lang),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildInfoRow(
-                          icon: Icons.help_outline,
-                          title: t('why_evacuate', lang),
-                          content: t('why_evacuate_desc', lang),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildInfoRow(
-                          icon: Icons.timer,
-                          title: t('evacuation_time', lang),
-                          content: t('evacuation_time_desc', lang),
-                        ),
-                      ],
+              // 持ち出し品チェックリストセクション
+              _buildSection(
+                title: '持ち出し品チェックリスト',
+                child: _buildEvacuationItems(preparedness, notifier),
+              ),
+              const SizedBox(height: 24),
+
+              // 緊急連絡先セクション（2枚目に含まれる可能性があるため、一旦コメントアウト）
+              // _buildSection(
+              //   title: '緊急連絡先',
+              //   child: _buildEmergencyContacts(preparedness, notifier),
+              // ),
+              // const SizedBox(height: 24),
+
+              // 学びのコラムセクション
+              const Text(
+                '学びのコラム',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                  letterSpacing: -0.24,
+                ),
+              ),
+              const SizedBox(height: 12),
+              // コラムカードを横並びで表示
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    InfoColumnCard(
+                      title: '適切な応急処置',
+                      description: '怪我をした場合の基本的な応急処置方法を学びましょう。',
+                      image: Image.network(
+                        'http://localhost:3845/assets/e344e8860b778d7fc13f8b376acdc3533ae3566a.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Icon(Icons.image, color: Colors.grey, size: 32),
+                          );
+                        },
+                      ),
+                      onTap: () {
+                        // TODO: コラム詳細ページへ遷移
+                      },
+                    ),
+                    const SizedBox(width: 16),
+                    InfoColumnCard(
+                      title: '女性向け情報',
+                      description: '避難所での安全対策や必要な物品について学びましょう。',
+                      imageHeight: 101, // 女性向け情報は101px
+                      image: Image.network(
+                        'http://localhost:3845/assets/9f12d372cef0312478f023ee1be5c6279cd332eb.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Icon(Icons.image, color: Colors.grey, size: 32),
+                          );
+                        },
+                      ),
+                      onTap: () {
+                        // TODO: コラム詳細ページへ遷移
+                      },
+                    ),
+                    const SizedBox(width: 16),
+                    InfoColumnCard(
+                      title: '過去の災害から学ぶ',
+                      description: '過去の災害でどのような被害が及んだのか、学びましょう',
+                      image: Image.network(
+                        'http://localhost:3845/assets/588712f261884a9f65430f1711c51c0e9aea210d.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Icon(Icons.image, color: Colors.grey, size: 32),
+                          );
+                        },
+                      ),
+                      onTap: () {
+                        // TODO: コラム詳細ページへ遷移
+                      },
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-
-                // コラム
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          t('column', lang),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildColumnItem(
-                          icon: Icons.person_outline,
-                          title: t('women_info', lang),
-                          content: t('women_info_desc', lang),
-                        ),
-                        const Divider(),
-                        _buildColumnItem(
-                          icon: Icons.medical_services,
-                          title: t('first_aid', lang),
-                          content: t('first_aid_desc', lang),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 32),
+            ],
           ),
-
-          /// 言語切替ボタン
-          Positioned(
-            top: 12,
-            right: 12,
-            child: _LanguageSwitcher(),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildInfoRow({
-    required IconData icon,
+  /// セクションを構築
+  Widget _buildSection({
     required String title,
-    required String content,
+    required Widget child,
   }) {
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: Colors.purple),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 4),
-              Text(content,
-                  style:
-                      const TextStyle(fontSize: 14, color: Colors.grey)),
-            ],
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+                letterSpacing: -0.24,
+              ),
+            ),
+            // 右側のプレースホルダー（Figmaデザインに合わせて）
+            Container(
+              width: 111,
+              height: 13,
+              color: const Color(0xFFF7F7F7),
+            ),
+          ],
         ),
+        const SizedBox(height: 12),
+        child,
       ],
     );
   }
 
-  Widget _buildColumnItem({
-    required IconData icon,
-    required String title,
-    required String content,
-  }) {
-    return InkWell(
-      onTap: () {},
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.purple),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(height: 4),
-                  Text(content,
-                      style: const TextStyle(
-                          fontSize: 14, color: Colors.grey)),
-                ],
-              ),
+  /// 持ち出し品チェックリスト（Figmaデザインに合わせて実装）
+  Widget _buildEvacuationItems(
+      EmergencyPreparednessState preparedness, EmergencyPreparedness notifier) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF2B3452).withOpacity(0.03),
+              offset: const Offset(0, 0),
+              blurRadius: 29.8,
+              spreadRadius: 10,
             ),
-            const Icon(Icons.chevron_right, color: Colors.grey),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ...preparedness.items.map(
+              (item) => _buildEvacuationItemRow(item, notifier),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  /// 持ち出し品アイテムの行（Figmaデザインに合わせて実装）
+  Widget _buildEvacuationItemRow(
+      dynamic item, EmergencyPreparedness notifier) {
+    final isChecked = item.checked;
+    final iconBackgroundColor =
+        isChecked ? const Color(0xFFEDFFE5) : const Color(0xFFF4F4F4);
+
+    return InkWell(
+      onTap: () => notifier.toggleItem(item.id),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 14),
+        child: Row(
+          children: [
+            const SizedBox(width: 16),
+            // アイコンエリア
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: iconBackgroundColor,
+                borderRadius: BorderRadius.circular(5.793),
+              ),
+              padding: const EdgeInsets.all(9.414),
+              child: isChecked
+                  ? const Icon(
+                      Icons.check,
+                      color: Color(0xFF00D26A),
+                      size: 24,
+                    )
+                  : Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD0D0D0),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+            ),
+            const SizedBox(width: 30),
+            // アイテム名
+            Expanded(
+              child: Text(
+                item.name,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2F3244),
+                  letterSpacing: -0.24,
+                ),
+              ),
+            ),
+            const SizedBox(width: 30),
+            // 削除アイコン
+            GestureDetector(
+              onTap: () => notifier.removeItem(item.id),
+              child: const Icon(
+                Icons.delete_outline,
+                size: 16,
+                color: Color(0xFF838383),
+              ),
+            ),
+            const SizedBox(width: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// フォーマットされた日時を取得
+  String _getFormattedDateTime() {
+    final now = DateTime.now();
+    final formatter = DateFormat('yyyy/MM/dd/HHmm');
+    return formatter.format(now);
   }
 }
 
